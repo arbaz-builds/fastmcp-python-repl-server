@@ -1,4 +1,4 @@
 fastmcp
 langchain-experimental
 uvicorn
-linkedin-api
+twikit
