@@ -1,5 +1,3 @@
 fastmcp
 langchain-experimental
 uvicorn
-twikit
-linkedin-api
