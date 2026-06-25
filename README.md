@@ -31,7 +31,7 @@ This is an **MCP (Model Context Protocol) server** that exposes a Python REPL as
 ## 📦 Installation
 
 ```bash
-git clone https://github.com/Pokemon455/fastmcp-python-repl-server.git
+git clone https://github.com/arbaz-builds/fastmcp-python-repl-server.git
 cd fastmcp-python-repl-server
 pip install -r requirements.txt
 ```
@@ -56,11 +56,11 @@ Then connect your LLM client to the MCP server endpoint!
 
 ## 🌟 Star this repo if it helped you!
 
-[![GitHub stars](https://img.shields.io/github/stars/Pokemon455/fastmcp-python-repl-server?style=social)](https://github.com/Pokemon455/fastmcp-python-repl-server/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/arbaz-builds/fastmcp-python-repl-server?style=social)](https://github.com/arbaz-builds/fastmcp-python-repl-server/stargazers)
 
 ---
 
 ## 👨‍💻 Author
 
 **Arbaz** — AI/ML Developer
-- GitHub: [@Pokemon455](https://github.com/Pokemon455)
+- GitHub: [@arbaz-builds](https://github.com/arbaz-builds)
