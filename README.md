@@ -23,8 +23,9 @@ This is an **MCP (Model Context Protocol) server** that exposes a Python REPL as
 - 🐍 Full Python REPL execution environment
 - 🔧 MCP-compatible (works with Claude, OpenAI, any LLM)
 - 📦 Easy to install and run
-- 🔒 Sandboxed execution
 - 🌐 HTTP server with SSE support
+
+> ⚠️ **Note on security:** This server executes arbitrary Python code with no built-in authentication or sandboxing beyond the host process. Do not expose this publicly without adding an API key / auth layer and running it inside an isolated container — anyone who can reach the endpoint can run code with the server's own privileges.
 
 ---
 
@@ -39,10 +40,10 @@ pip install -r requirements.txt
 ## 🏃 Usage
 
 ```bash
-python server.py
+python main.py
 ```
 
-Then connect your LLM client to the MCP server endpoint!
+Then connect your LLM client to the MCP server endpoint (default: `http://localhost:10000/mcp`, or your deployed URL + `/mcp`).
 
 ---
 
