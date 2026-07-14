@@ -13,6 +13,8 @@ A minimal [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server
 https://fastmcp-python-repl-server-production-9640.up.railway.app/mcp
 ```
 
+Use this endpoint with any MCP-compatible client that supports `streamable-http`.
+
 ---
 
 ## What it does
