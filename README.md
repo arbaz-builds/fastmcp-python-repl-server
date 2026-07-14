@@ -27,6 +27,43 @@ This is useful for letting an LLM do actual computation, quick data manipulation
 - **`langchain_experimental.tools.python.tool.PythonREPLTool`** — the actual code execution engine; one shared instance per server process, so state persists across calls.
 - **Transport:** `streamable-http`, served at the `/mcp` path, listening on `0.0.0.0` and the platform-provided `$PORT` (defaults to `10000` locally).
 
+## Architecture
+
+```
+MCP Client (Claude, LangChain, etc.)
+            │
+            ▼
+     FastMCP Server  (streamable-http, /mcp)
+            │
+            ▼
+      run_python Tool
+            │
+            ▼
+  LangChain PythonREPLTool
+            │
+            ▼
+    Python Interpreter
+            │
+            ▼
+          Output
+```
+
+**Example flow:** Claude decides it needs to compute something → calls `run_python()` → FastMCP routes the call → `PythonREPLTool` executes the code → result flows back through FastMCP → Claude receives the output and continues reasoning.
+
+## Compatible clients
+
+- ✅ Claude Desktop (via MCP config)
+- ✅ `langchain-mcp-adapters` (`MultiServerMCPClient`)
+- ✅ Any custom MCP client speaking `streamable-http`
+- ✅ OpenAI Agents SDK (MCP support)
+
+## Current limitations
+
+- **Single shared REPL** — one global session for all callers; no per-client isolation
+- **No sandboxing** — code runs with the host process's own permissions
+- **No authentication** — the `/mcp` endpoint is open to anyone who can reach it
+- **No execution timeout** — a long-running or infinite loop will block the shared REPL for all callers
+
 ## Installation
 
 ```bash
