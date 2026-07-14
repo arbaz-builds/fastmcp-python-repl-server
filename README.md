@@ -1,35 +1,33 @@
-# ⚡ FastMCP Python REPL Server
+# FastMCP Python REPL Server
 
-[![Python](https://img.shields.io/badge/Python-3.9%2B-blue?style=for-the-badge&logo=python)](https://python.org)
-[![FastMCP](https://img.shields.io/badge/FastMCP-Latest-green?style=for-the-badge)](https://github.com/jlowin/fastmcp)
-[![LLM](https://img.shields.io/badge/LLM-Compatible-purple?style=for-the-badge)](https://openai.com)
-[![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)](https://python.org)
+[![FastMCP](https://img.shields.io/badge/FastMCP-2.x-green)](https://github.com/jlowin/fastmcp)
+[![Protocol](https://img.shields.io/badge/MCP-Streamable%20HTTP-purple)](https://modelcontextprotocol.io)
+[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
-> 🤖 A powerful Python REPL server built with **FastMCP** — enabling LLMs (Claude, GPT-4, etc.) to execute Python code in real-time!
+A minimal [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server that gives any MCP-compatible AI assistant (Claude, GPT, etc.) a live Python REPL as a callable tool.
 
----
-
-## 🚀 What is this?
-
-This is an **MCP (Model Context Protocol) server** that exposes a Python REPL as a tool. This means:
-- 🧠 Your AI (Claude, GPT-4, etc.) can **write AND run Python code**
-- 📊 Perfect for data analysis, automation, and complex calculations
-- ⚡ Built on FastMCP for blazing fast performance
+**Live server:** `https://fastmcp-python-repl-server-production-9640.up.railway.app/mcp`
 
 ---
 
-## ✨ Features
+## What it does
 
-- 🐍 Full Python REPL execution environment
-- 🔧 MCP-compatible (works with Claude, OpenAI, any LLM)
-- 📦 Easy to install and run
-- 🌐 HTTP server with SSE support
+The server exposes exactly one MCP tool, `run_python`, backed by LangChain's `PythonREPLTool`:
 
-> ⚠️ **Note on security:** This server executes arbitrary Python code with no built-in authentication or sandboxing beyond the host process. Do not expose this publicly without adding an API key / auth layer and running it inside an isolated container — anyone who can reach the endpoint can run code with the server's own privileges.
+- The assistant sends a string of Python code.
+- The server executes it in a persistent REPL session (variables and imports carry over between calls).
+- stdout/stderr is captured and returned as the tool result.
 
----
+This is useful for letting an LLM do actual computation, quick data manipulation, or verification of its own logic instead of just reasoning in text.
 
-## 📦 Installation
+## How it's built
+
+- **[FastMCP](https://github.com/jlowin/fastmcp)** — handles MCP protocol details, tool registration (`@mcp.tool()`), and the HTTP transport.
+- **`langchain_experimental.tools.python.tool.PythonREPLTool`** — the actual code execution engine; one shared instance per server process, so state persists across calls.
+- **Transport:** `streamable-http`, served at the `/mcp` path, listening on `0.0.0.0` and the platform-provided `$PORT` (defaults to `10000` locally).
+
+## Installation
 
 ```bash
 git clone https://github.com/arbaz-builds/fastmcp-python-repl-server.git
@@ -37,31 +35,50 @@ cd fastmcp-python-repl-server
 pip install -r requirements.txt
 ```
 
-## 🏃 Usage
+## Running locally
 
 ```bash
 python main.py
 ```
 
-Then connect your LLM client to the MCP server endpoint (default: `http://localhost:10000/mcp`, or your deployed URL + `/mcp`).
+The server starts at `http://localhost:10000/mcp`. Point any MCP client (Claude Desktop, a custom `langchain-mcp-adapters` client, etc.) at that URL.
 
----
+## Deploying
 
-## 🛠️ Tech Stack
+Any platform that can run a long-lived Python process and exposes a `$PORT` env var works out of the box (Render, Railway, Fly.io, etc.) — no extra configuration needed beyond installing `requirements.txt` and starting `python main.py`.
 
-- **FastMCP** — MCP server framework
-- **Python** — REPL execution
-- **SSE** — Real-time streaming
+## Tool reference
 
----
+### `run_python(code: str) -> str`
 
-## 🌟 Star this repo if it helped you!
+Executes `code` in the shared REPL session and returns its captured output.
 
-[![GitHub stars](https://img.shields.io/github/stars/arbaz-builds/fastmcp-python-repl-server?style=social)](https://github.com/arbaz-builds/fastmcp-python-repl-server/stargazers)
+```python
+# input
+"print(sum([1, 2, 3]))"
 
----
+# output
+"6"
+```
 
-## 👨‍💻 Author
+## ⚠️ Security
 
-**Arbaz** — AI/ML Developer
-- GitHub: [@arbaz-builds](https://github.com/arbaz-builds)
+This server executes **arbitrary Python code with no authentication or sandboxing** beyond the host process. Anyone who can reach the `/mcp` endpoint can run code with the server's own privileges (including network/file access from that machine).
+
+Do not expose this publicly as-is. Before any real deployment, add at minimum:
+- An auth layer (API key / bearer token check in front of the MCP endpoint)
+- Process isolation (container with restricted permissions, no sensitive mounted volumes or credentials)
+- Resource limits (timeouts, memory caps) to prevent runaway or malicious code from affecting the host
+
+## Tech stack
+
+| Component | Purpose |
+|---|---|
+| FastMCP | MCP server framework, tool registration, HTTP transport |
+| langchain-experimental | `PythonREPLTool` — the code execution engine |
+| uvicorn | ASGI server underneath FastMCP's HTTP transport |
+
+## Author
+
+**Mohammad Arbaz** — AI/LLM Engineer
+[GitHub @arbaz-builds](https://github.com/arbaz-builds)
