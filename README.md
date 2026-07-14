@@ -7,7 +7,11 @@
 
 A minimal [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server that gives any MCP-compatible AI assistant (Claude, GPT, etc.) a live Python REPL as a callable tool.
 
-**Live server:** `https://fastmcp-python-repl-server-production-9640.up.railway.app/mcp`
+### 🚀 Live MCP Endpoint
+
+```
+https://fastmcp-python-repl-server-production-9640.up.railway.app/mcp
+```
 
 ---
 
@@ -96,6 +100,18 @@ Executes `code` in the shared REPL session and returns its captured output.
 
 # output
 "6"
+```
+
+**Example MCP request/response:**
+
+```
+Client call:
+  run_python("import math\nprint(math.factorial(5))")
+
+↓
+
+Server output:
+  "120"
 ```
 
 ## ⚠️ Security
